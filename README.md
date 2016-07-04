@@ -8,6 +8,4 @@ Installation
 
 To install otpsecure-python_sdk, simply:
 
-.. code:: sh
-
     $ pip install otpsecure
