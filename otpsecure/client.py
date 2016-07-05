@@ -14,7 +14,6 @@ except ImportError:
 
 from otpsecure.base       import Base
 from otpsecure.otp       import Otp
-from otpsecure.pdf       import Pdf
 from otpsecure.status      import Status
 from otpsecure.error      import Error
 
