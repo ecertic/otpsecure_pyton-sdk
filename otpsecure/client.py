@@ -8,25 +8,26 @@ import hmac
 import urllib
 
 try:
-  from urllib.parse import urljoin
+	from urllib.parse import urljoin
 except ImportError:
-  from urlparse import urljoin
+	from urlparse import urljoin
 
 from otpsecure.base				import Base
 from otpsecure.otp				import Otp
 from otpsecure.pdf				import Pdf
 from otpsecure.status			import Status
+from otpsecure.error			import Error
 
-ENDPOINT	   = 'http://api.otpsecure.net/'
-CLIENT_VERSION = '1.0.0'
-PYTHON_VERSION = '%d.%d.%d' % (sys.version_info[0], sys.version_info[1], sys.version_info[2])
+ENDPOINT		= 'http://api.otpsecure.net/'
+CLIENT_VERSION	= '1.0.0'
+PYTHON_VERSION	= '%d.%d.%d' % (sys.version_info[0], sys.version_info[1], sys.version_info[2])
 
 
 class ErrorException(Exception):
-  def __init__(self, errors):
-	self.errors = errors
-	message = ' '.join([str(e) for e in self.errors])
-	super(ErrorException, self).__init__(message)
+	def __init__(self, errors):
+		self.errors = errors
+		message = ' '.join([str(e) for e in self.errors])
+		super(ErrorException, self).__init__(message)
 
 
 class Client(object):
@@ -53,11 +54,11 @@ class Client(object):
 		hmacstr = 'Hmac %s:%s' % (self.apikey, hmac_encode)
 
 		headers = {
-		  'Accept'			: content_type,
-		  'date'			: timestamp,
-		  'authorization'	: hmacstr,
-		  'User-Agent'		: 'otpsecure/ApiClient/%s Python/%s' % (CLIENT_VERSION, PYTHON_VERSION),
-		  'Content-Type'	: content_type
+			'Accept'			: content_type,
+			'date'				: timestamp,
+			'authorization'		: hmacstr,
+			'User-Agent'		: 'otpsecure/ApiClient/%s Python/%s' % (CLIENT_VERSION, PYTHON_VERSION),
+			'Content-Type'		: content_type
 		}
 		
 		print method + ' ' + url
