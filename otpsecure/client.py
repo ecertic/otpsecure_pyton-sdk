@@ -54,11 +54,11 @@ class Client(object):
     hmacstr = 'Hmac %s:%s' % (self.apikey, hmac_encode)
 
     headers = {
-      'Accept'      : content_type,
-      'date'       : timestamp,
-      'authorization'   : hmacstr,
+      'Accept'        : content_type,
+      'date'          : timestamp,
+      'authorization' : hmacstr,
       'User-Agent'    : 'otpsecure/ApiClient/%s Python/%s' % (CLIENT_VERSION, PYTHON_VERSION),
-      'Content-Type'   : content_type
+      'Content-Type'  : content_type
     }
     
     print method + ' ' + url
