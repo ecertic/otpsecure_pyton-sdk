@@ -60,10 +60,6 @@ class Client(object):
       'User-Agent'    : 'otpsecure/ApiClient/%s Python/%s' % (CLIENT_VERSION, PYTHON_VERSION),
       'Content-Type'  : content_type
     }
-    
-    print method + ' ' + url
-    print hmacstr
-    print data
 
     if method == 'GET':
       response = requests.get(url, verify=True, headers=headers, params=params)
