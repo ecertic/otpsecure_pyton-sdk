@@ -81,10 +81,6 @@ class Client(object):
     """Retrieve a client token and send otp sms."""
     return Otp().load(self.request('sms', 'POST', params))
 
-  def pdf(self, id, params={}):
-    """Retrieve a client pdf by id."""
-    return Pdf().load(self.request('pdf/' + id, 'POST', params))
-
   def status(self, token, params={}):
     """Retrieve a client pdf by id."""
     params.update({'token': token})
