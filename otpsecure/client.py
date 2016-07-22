@@ -17,7 +17,7 @@ from otpsecure.otp       import Otp
 from otpsecure.status      import Status
 from otpsecure.error      import Error
 
-ENDPOINT    = 'http://api.otpsecure.net/'
+ENDPOINT    = 'https://api.otpsecure.net/'
 CLIENT_VERSION = '1.0.0'
 PYTHON_VERSION = '%d.%d.%d' % (sys.version_info[0], sys.version_info[1], sys.version_info[2])
 
@@ -61,9 +61,9 @@ class Client(object):
     }
 
     if method == 'GET':
-      response = requests.get(url, verify=True, headers=headers, params=params)
+      response = requests.get(url, verify=False, headers=headers, params=params)
     else:
-      response = requests.post(url, verify=True, headers=headers, data=json.dumps(params,separators=(',', ':'))) 
+      response = requests.post(url, verify=False, headers=headers, data=json.dumps(params,separators=(',', ':'))) 
         
     if response.status_code in self._supported_status_codes:
       json_response = response.json()
