@@ -6,6 +6,8 @@ import hashlib
 from hashlib import sha1
 import hmac
 import urllib
+import base64
+from Crypto.Cipher import AES
 
 try:
   from urllib.parse import urljoin
@@ -13,14 +15,16 @@ except ImportError:
   from urlparse import urljoin
 
 from otpsecure.base       import Base
-from otpsecure.otp       import Otp
-from otpsecure.status      import Status
+from otpsecure.otp        import Otp
+from otpsecure.callback   import Callback
+from otpsecure.status     import Status
 from otpsecure.error      import Error
 
 ENDPOINT    = 'https://api.otpsecure.net/'
 CLIENT_VERSION = '1.0.0'
 PYTHON_VERSION = '%d.%d.%d' % (sys.version_info[0], sys.version_info[1], sys.version_info[2])
 
+unpad = lambda s : s[:-ord(s[len(s)-1:])]
 
 class ErrorException(Exception):
   def __init__(self, errors):
@@ -79,6 +83,18 @@ class Client(object):
   def otp(self, params={}):
     """Retrieve a client token and send otp sms."""
     return Otp().load(self.request('sms', 'POST', params))
+    
+  def callback(self, request):
+    """Retrieve a client token and send otp sms."""
+    return Callback().load(json.loads(self.decrypt(request)))
+    
+  def decrypt(self, request):
+    if request.form.getlist('data')[0]:
+      encrypted = request.form.getlist('data')[0]
+      enc = base64.b64decode(encrypted[24:])
+      iv = base64.b64decode(encrypted[:24])
+      cipher = AES.new(self.secret, AES.MODE_CBC, iv )
+      return unpad(cipher.decrypt( enc ))
 
   def status(self, token, params={}):
     """Retrieve a client pdf by id."""
