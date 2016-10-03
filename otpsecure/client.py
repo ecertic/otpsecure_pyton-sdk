@@ -24,7 +24,7 @@ from otpsecure.status     import Status
 from otpsecure.error      import Error
 
 ENDPOINT    = 'https://api.otpsecure.net/'
-CLIENT_VERSION = '1.0.1'
+CLIENT_VERSION = '1.0.3'
 PYTHON_VERSION = '%d.%d.%d' % (sys.version_info[0], sys.version_info[1], sys.version_info[2])
 
 unpad = lambda s : s[:-ord(s[len(s)-1:])]
