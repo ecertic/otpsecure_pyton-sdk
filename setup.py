@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
 	name			 = 'otpsecure',
 	packages		 = ['otpsecure'],
-	version			 = '1.0.1',
+	version			 = '1.0.2',
 	description		 = "OtpSecure's Python SDK",
 	author			 = 'OtpSecure',
 	author_email	 = 'sistemas@ecertic.com',

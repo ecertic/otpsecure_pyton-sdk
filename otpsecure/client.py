@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+#encoding=utf8
+
 import sys
 import json
 import requests
@@ -21,7 +24,7 @@ from otpsecure.status     import Status
 from otpsecure.error      import Error
 
 ENDPOINT    = 'https://api.otpsecure.net/'
-CLIENT_VERSION = '1.0.0'
+CLIENT_VERSION = '1.0.1'
 PYTHON_VERSION = '%d.%d.%d' % (sys.version_info[0], sys.version_info[1], sys.version_info[2])
 
 unpad = lambda s : s[:-ord(s[len(s)-1:])]
@@ -44,17 +47,18 @@ class Client(object):
 
     timestamp = str(int(round(time.time() * 1000)))
 
-    data = json.dumps(params,separators=(',', ':'))
+    data = json.dumps(params,separators=(',', ':'), ensure_ascii=False)
 
     m = hashlib.md5()
     m.update(data)
-    md5 = m.digest().encode('base64').rstrip('\n')
+    md5 = m.hexdigest()
 
     content_type = 'application/json'
     concatenar = method + '\n' + md5 + '\n' + content_type + '\n' + timestamp
 
-    hmac_encode = hmac.new(self.secret, urllib.unquote(concatenar), sha1).digest().encode('base64').rstrip('\n')
+    hmac_encode = hmac.new(self.secret, urllib.unquote(concatenar), sha1).hexdigest()
     hmacstr = 'Hmac %s:%s' % (self.apikey, hmac_encode)
+    print hmacstr
 
     headers = {
       'Accept'        : content_type,
@@ -67,7 +71,7 @@ class Client(object):
     if method == 'GET':
       response = requests.get(url, verify=False, headers=headers, params=params)
     else:
-      response = requests.post(url, verify=False, headers=headers, data=json.dumps(params,separators=(',', ':'))) 
+      response = requests.post(url, verify=False, headers=headers, data=json.dumps(params,separators=(',', ':'), ensure_ascii=False)) 
         
     if response.status_code in self._supported_status_codes:
       json_response = response.json()
