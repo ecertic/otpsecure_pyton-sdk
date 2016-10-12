@@ -1,7 +1,10 @@
 #!/usr/bin/env python
-#encoding=utf8
+#encoding=utf-8
+ 
+import sys  
+reload(sys)  
+sys.setdefaultencoding('utf-8')
 
-import sys
 import json
 import requests
 import time
@@ -10,6 +13,7 @@ from hashlib import sha1
 import hmac
 import urllib
 import base64
+from bs4 import UnicodeDammit
 from Crypto.Cipher import AES
 
 try:
@@ -24,7 +28,7 @@ from otpsecure.status     import Status
 from otpsecure.error      import Error
 
 ENDPOINT    = 'https://api.otpsecure.net/'
-CLIENT_VERSION = '1.0.3'
+CLIENT_VERSION = '1.0.4'
 PYTHON_VERSION = '%d.%d.%d' % (sys.version_info[0], sys.version_info[1], sys.version_info[2])
 
 unpad = lambda s : s[:-ord(s[len(s)-1:])]
@@ -43,22 +47,23 @@ class Client(object):
     self._supported_status_codes = [200, 201, 204, 401, 404, 405, 422]
 
   def request(self, path, method='GET', params={}):
+  
+    self.convert(params)
+  
     url = urljoin(ENDPOINT, path)
-
     timestamp = str(int(round(time.time() * 1000)))
-
-    data = json.dumps(params,separators=(',', ':'), ensure_ascii=False)
-
+    
+    data = json.dumps(self.convert(params), skipkeys=True, separators=(',', ':'), ensure_ascii=False, encoding="utf-8")
+    
     m = hashlib.md5()
+
     m.update(data)
     md5 = m.hexdigest()
 
     content_type = 'application/json'
     concatenar = method + '\n' + md5 + '\n' + content_type + '\n' + timestamp
-
     hmac_encode = hmac.new(self.secret, urllib.unquote(concatenar), sha1).hexdigest()
     hmacstr = 'Hmac %s:%s' % (self.apikey, hmac_encode)
-    print hmacstr
 
     headers = {
       'Accept'        : content_type,
@@ -71,11 +76,10 @@ class Client(object):
     if method == 'GET':
       response = requests.get(url, verify=False, headers=headers, params=params)
     else:
-      response = requests.post(url, verify=False, headers=headers, data=json.dumps(params,separators=(',', ':'), ensure_ascii=False)) 
+      response = requests.post(url, verify=False, headers=headers, data=data)
         
     if response.status_code in self._supported_status_codes:
       json_response = response.json()
-      print json_response
     else:
       response.raise_for_status()
 
@@ -87,11 +91,11 @@ class Client(object):
   def otp(self, params={}):
     """Retrieve a client token and send otp sms."""
     return Otp().load(self.request('sms', 'POST', params))
-    
+
   def callback(self, request):
     """Retrieve a client token and send otp sms."""
     return Callback().load(json.loads(self.decrypt(request)))
-    
+
   def decrypt(self, request):
     if request.form.getlist('data')[0]:
       encrypted = request.form.getlist('data')[0]
@@ -99,6 +103,16 @@ class Client(object):
       iv = base64.b64decode(encrypted[:24])
       cipher = AES.new(self.secret, AES.MODE_CBC, iv )
       return unpad(cipher.decrypt( enc ))
+
+  def convert(self, input):
+    if isinstance(input, dict):
+        return {self.convert(key): self.convert(value) for key, value in input.iteritems()}
+    elif isinstance(input, list):
+        return [self.convert(element) for element in input]
+    elif isinstance(input, (str,unicode)):
+        return str(UnicodeDammit(input, is_html=True).unicode_markup)
+    else:
+        return input
 
   def status(self, token, params={}):
     """Retrieve a client pdf by id."""
