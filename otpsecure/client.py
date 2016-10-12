@@ -48,8 +48,6 @@ class Client(object):
 
   def request(self, path, method='GET', params={}):
   
-    self.convert(params)
-  
     url = urljoin(ENDPOINT, path)
     timestamp = str(int(round(time.time() * 1000)))
     
