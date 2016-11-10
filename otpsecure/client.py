@@ -24,11 +24,12 @@ except ImportError:
 from otpsecure.base       import Base
 from otpsecure.otp        import Otp
 from otpsecure.callback   import Callback
+from otpsecure.document   import Document
 from otpsecure.status     import Status
 from otpsecure.error      import Error
 
 ENDPOINT    = 'https://api.otpsecure.net/'
-CLIENT_VERSION = '1.0.5'
+CLIENT_VERSION = '1.0.6'
 PYTHON_VERSION = '%d.%d.%d' % (sys.version_info[0], sys.version_info[1], sys.version_info[2])
 
 unpad = lambda s : s[:-ord(s[len(s)-1:])]
@@ -92,7 +93,11 @@ class Client(object):
 
   def callback(self, request):
     """Retrieve a client token and send otp sms."""
-    return Callback().load(json.loads(self.decrypt(request)))
+    cb = Callback().load(json.loads(self.decrypt(request)))
+    if isinstance(cb.documents, list):
+		for i, val in enumerate(cb.documents):
+			cb.documents[i] = Document().load(val)
+    return cb
 
   def decrypt(self, request):
     if request.form.getlist('data')[0]:

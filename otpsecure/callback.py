@@ -5,5 +5,6 @@ class Callback(Base):
     self.id             = None
     self.cid            = None
     self.status 		= None
+    self.documents	    = None
     self.filename	    = None
     self.filecontent    = None
